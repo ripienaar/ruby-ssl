@@ -1,0 +1,8 @@
+dir = File.expand_path(File.dirname(__FILE__))
+$LOAD_PATH.unshift("#{dir}/")
+$LOAD_PATH.unshift("#{dir}/../lib")
+
+require 'ssl'
+require 'rubygems'
+require 'rspec'
+
