@@ -7,19 +7,19 @@ combination of RSA and AES
 Data will be AES encrypted for speed, the Key and IV used in
 the AES stage will be encrypted using RSA
 
-   ssl = SSL.new(public_key, private_key, passphrase)
+	ssl = SSL.new(public_key, private_key, passphrase)
 
-   data = File.read("largefile.dat")
+	data = File.read("largefile.dat")
 
-   crypted_data = ssl.encrypt_with_private(data)
+	crypted_data = ssl.encrypt_with_private(data)
 
-   pp crypted_data
+	pp crypted_data
 
 This will result in a hash of data like:
 
-   crypted = {:key  => "crd4NHvG....=",
-              :iv   => "Ny2BPOPj....=",
-              :data => "XWXlqN+i...=="}
+	crypted = {:key  => "crd4NHvG....=",
+	           :iv   => "Ny2BPOPj....=",
+	           :data => "XWXlqN+i...=="}
 
 The key, iv and data will all be base 64 encoded already
 
