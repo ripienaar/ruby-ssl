@@ -14,7 +14,7 @@ describe SSL do
 
     it "should decrypt what it encrypted with RSA" do
         crypted = @ssl.aes_encrypt("foo")
-        decrypted = @ssl.aes_decrypt(crypted[:key], crypted[:iv], crypted[:data])
+        decrypted = @ssl.aes_decrypt(crypted[:key], crypted[:data])
 
         decrypted.should == "foo"
     end
@@ -34,7 +34,7 @@ describe SSL do
     end
 
     it "using a helper it should be able to decrypt with private key what it encrypted using the public key" do
-        @ssl.decrypt_with_private(@ssl.crypt_with_public("foo")).should == "foo"
+        @ssl.decrypt_with_private(@ssl.encrypt_with_public("foo")).should == "foo"
     end
 
     it "using a helper it should be able to decrypt with public key what it encrypted using the private key" do
@@ -94,40 +94,36 @@ describe SSL do
     end
 
     describe "#aes_encrypt" do
-        it "should create a key, iv and data" do
+        it "should create a key and data" do
             crypted = @ssl.aes_encrypt("foo")
 
             crypted.include?(:key).should == true
-            crypted.include?(:iv).should == true
             crypted.include?(:data).should == true
         end
     end
 
     describe "#aes_decrypt" do
-        it "should decrypted correctly given key, iv and data" do
-            key = @ssl.base64_decode("vguhtzSXI16NNb2wrS6S50Y2NjqfV4ZynqYIXTtT064=")
-            iv = @ssl.base64_decode("NP6ijoDxy6pQ0TGAO+uL5A==")
-            data = @ssl.base64_decode("b6RIfR4GYl20BkHO2XzreA==")
+        it "should decrypted correctly given key and data" do
+            key = @ssl.base64_decode("rAaCyW6qB0XqZNa9hji0qHwrI3P47t8diLNXoemW9ss=")
+            data = @ssl.base64_decode("mSthvO/wSl0ArNOcgysTVw==")
 
-            @ssl.aes_decrypt(key, iv, data).should == "foo"
+            @ssl.aes_decrypt(key, data).should == "foo"
         end
     end
 
     describe "#decrypt_with_public" do
-        it "should decrypt correctly given key, iv and data in base64 format" do
-            crypted = {:key  => "crd4NHvG3A3acSLe9xUU14Lg0wy/cfhCsTsTN92yvjPqbSu5IQbGa5tz5/Ey\nLrw5pfcyLyb3RBKutsgieNhFxVlmMrgsrJV6OcIVuTTDTgK/Kg2Ig/u2FAau\naT2Vwyqi9ahwAPTy9858lcvoA1XSfdmI+roD3Y2L0F6YJGrK8qk=",
-                       :iv   => "Ny2BPOPjw6y08+9wB3hQY8ym2xdVoTkcg2RHENbFVjX4DuORkwtVw4iLH59x\ncsaOQi+sLzrA90ncOXYEp+4iP26wdYgUbC7RqVvE9WxBPBuwvdIgZBpH07Oj\nNzYjBrLPROsYfGQkAx382WNGhqsGiLv7xfq508N0p/5LiR1oqE4=",
-                       :data => "XWXlqN+i0uHTshzDEFQQqQ=="}
+        it "should decrypt correctly given key and data in base64 format" do
+            crypted = {:key=> "YaRcSDdcKgnRZ4Eu2eirl/+lzDgVkPZ41kXAQQNOi+6AfjdbbOW7Zblibx9r\n3TzZAi0ulA94gqNAXPvPC8LaO8W9TtJwlto/RHwDM7ZdfqEImSYoVACFNq28\n+0MLr3K3hIBsB1pyxgFTQul+MrCq+3Fik7Nj7ZKkJUT2veyqbg8=",
+                       :data=>"TLVw1EYeOaGDmEC/R2I/cA=="}
 
             @ssl.decrypt_with_public(crypted).should == "foo"
         end
     end
 
     describe "#decrypt_with_private" do
-        it "should decrypt correctly given key, iv and data in base64 format" do
-            crypted = {:key  => "m5dYEwqoOe1CTTSd3bNjtjYazS8jp97MrwG3t8OqY34c5wCHQ0ugDixGHwVP\nFQJHOWX/uXxbCnAqePTN2skHVYY5YNBo1oKxGy6s+GbNA59QDRT/1zzBphkU\nIoKnAHCjl3LQd8rW+rzavvgUlnuI6N6v4fqHoDYkav2/1UFa+Zg=",
-                       :iv   => "jV0NpLdctTuxvCFd8NdcHo4wyeGMA0Axuc1qOkycmrHHpIS6N77YG8XeXly7\nI9yxKZBFMAsU1bVJaNZSo/rpxASdRj19DMK5jdVqO1I3txyRXhe8VyiMXA/i\n+WzX6Tqtnb7jF3vjSvnQ4SDd/b9WqgmKV2+BBB5dgJYLpLhBRHg=",
-                       :data => "RDidRVhJaxbib1aVLkT+Mg=="}
+        it "should decrypt correctly given key and data in base64 format" do
+            crypted = {:key=> "kO1kUgJBiEBdoajN4OHp9BOie6dCznf1YKbBnp3LOyBxcDDQtjxEBlPmjQve\npXrQJ5xpLX6oNBxzU18Pf2SKYUZSbzIkDUb97GQY0WoBQsdM2OwPXH+HtF2A\no5N8iIx9srPAEAFa6hZAdqvcmRT/SzhP1kH+Gyy8fyvW8HGBjNY=",
+                       :data=>"gDTaHCmes/Yua4jtjmgukQ=="}
 
             @ssl.decrypt_with_private(crypted).should == "foo"
         end

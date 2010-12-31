@@ -18,10 +18,9 @@ require 'base64'
 # This will result in a hash of data like:
 #
 #   crypted = {:key  => "crd4NHvG....=",
-#              :iv   => "Ny2BPOPj....=",
 #              :data => "XWXlqN+i...=="}
 #
-# The key, iv and data will all be base 64 encoded already
+# The key and data will be base 64 encoded already
 #
 # You can pass the data hash into ssl.decrypt_with_public which
 # should return your original data
@@ -45,14 +44,13 @@ class SSL
     # the key and IV
     #
     # Return a hash with everything base 64 encoded
-    def crypt_with_public(plain_text)
+    def encrypt_with_public(plain_text)
         crypted = aes_encrypt(plain_text)
 
-        encoded_iv = base64_encode(rsa_encrypt_with_public(crypted[:iv]))
         encoded_key = base64_encode(rsa_encrypt_with_public(crypted[:key]))
         encoded_data = base64_encode(crypted[:data])
 
-        {:iv => encoded_iv, :key => encoded_key, :data => encoded_data}
+        {:key => encoded_key, :data => encoded_data}
     end
 
     # Encrypts supplied data using AES and then encrypts using RSA
@@ -62,35 +60,30 @@ class SSL
     def crypt_with_private(plain_text)
         crypted = aes_encrypt(plain_text)
 
-        encoded_iv = base64_encode(rsa_encrypt_with_private(crypted[:iv]))
         encoded_key = base64_encode(rsa_encrypt_with_private(crypted[:key]))
         encoded_data = base64_encode(crypted[:data])
 
-        {:iv => encoded_iv, :key => encoded_key, :data => encoded_data}
+        {:key => encoded_key, :data => encoded_data}
     end
 
     # Decrypts data, expects a hash as create with crypt_with_public
     def decrypt_with_private(crypted)
-        raise "Crypted data should include a IV" unless crypted.include?(:iv)
         raise "Crypted data should include a key" unless crypted.include?(:key)
         raise "Crypted data should include data" unless crypted.include?(:data)
 
-        iv = rsa_decrypt_with_private(base64_decode(crypted[:iv]))
         key = rsa_decrypt_with_private(base64_decode(crypted[:key]))
 
-        aes_decrypt(key, iv, base64_decode(crypted[:data]))
+        aes_decrypt(key, base64_decode(crypted[:data]))
     end
 
     # Decrypts data, expects a hash as create with crypt_with_private
     def decrypt_with_public(crypted)
-        raise "Crypted data should include a IV" unless crypted.include?(:iv)
         raise "Crypted data should include a key" unless crypted.include?(:key)
         raise "Crypted data should include data" unless crypted.include?(:data)
 
-        iv = rsa_decrypt_with_public(base64_decode(crypted[:iv]))
         key = rsa_decrypt_with_public(base64_decode(crypted[:key]))
 
-        aes_decrypt(key, iv, base64_decode(crypted[:data]))
+        aes_decrypt(key, base64_decode(crypted[:data]))
     end
 
     # Use the public key to RSA encrypt data
@@ -127,25 +120,22 @@ class SSL
         cipher.encrypt
 
         key = cipher.random_key
-        iv = cipher.random_iv
 
         cipher.key = key
-        cipher.iv = iv
-        encrypted_data = cipher.update(plain_string)
-        encrypted_data << cipher.final
+        cipher.pkcs5_keyivgen(key)
+        encrypted_data = cipher.update(plain_string) + cipher.final
 
-        {:key => key, :iv => iv, :data => encrypted_data}
+        {:key => key, :data => encrypted_data}
     end
 
     # decrypts a string given key, iv and data
-    def aes_decrypt(key, iv, crypt_string)
+    def aes_decrypt(key, crypt_string)
         cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
 
         cipher.decrypt
         cipher.key = key
-        cipher.iv = iv
-        decrypted_data = cipher.update(crypt_string)
-        decrypted_data << cipher.final
+        cipher.pkcs5_keyivgen(key)
+        decrypted_data = cipher.update(crypt_string) + cipher.final
     end
 
     # base 64 encode a string
