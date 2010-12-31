@@ -128,4 +128,32 @@ describe SSL do
             @ssl.decrypt_with_private(crypted).should == "foo"
         end
     end
+
+    describe "#decrypt_with_private" do
+        it "should fail if not given a key" do
+            expect {
+                @ssl.decrypt_with_private({:iv => "x", :data => "x"})
+            }.to raise_error("Crypted data should include a key")
+        end
+
+        it "should fail if not given data" do
+            expect {
+                @ssl.decrypt_with_private({:iv => "x", :key => "x"})
+            }.to raise_error("Crypted data should include data")
+        end
+    end
+
+    describe "#decrypt_with_public" do
+        it "should fail if not given a key" do
+            expect {
+                @ssl.decrypt_with_public({:iv => "x", :data => "x"})
+            }.to raise_error("Crypted data should include a key")
+        end
+
+        it "should fail if not given data" do
+            expect {
+                @ssl.decrypt_with_public({:iv => "x", :key => "x"})
+            }.to raise_error("Crypted data should include data")
+        end
+    end
 end
