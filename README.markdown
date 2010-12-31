@@ -29,12 +29,17 @@ should return your original data
 There are matching methods for using a public key to encrypt
 data to be decrypted using a private key
 
+Realted Links?
+--------------
+
+https://github.com/nahi/ruby-crypt
+
 Licence?
-========
+--------
 
 Apache 2.0
 
 Contact?
-========
+--------
 
 R.I.Pienaar / rip@devco.net / www.devco.net / @ripienaar
