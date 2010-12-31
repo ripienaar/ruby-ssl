@@ -18,10 +18,9 @@ the AES stage will be encrypted using RSA
 This will result in a hash of data like:
 
 	crypted = {:key  => "crd4NHvG....=",
-	           :iv   => "Ny2BPOPj....=",
 	           :data => "XWXlqN+i...=="}
 
-The key, iv and data will all be base 64 encoded already
+The key and data will be base 64 encoded already
 
 You can pass the data hash into ssl.decrypt_with_public which
 should return your original data
