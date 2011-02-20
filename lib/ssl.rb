@@ -28,7 +28,7 @@ require 'base64'
 # There are matching methods for using a public key to encrypt
 # data to be decrypted using a private key
 class SSL
-    PASSWD_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@£$%^&*()_+{}|":\;?><,./~`'
+    PASSWD_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@$%^&*()_+{}|":\;?><,./~`'
 
     attr_reader :public_key_file, :private_key_file
 
