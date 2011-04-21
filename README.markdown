@@ -7,7 +7,7 @@ combination of RSA and AES
 Data will be AES encrypted for speed, the Key and IV used in
 the AES stage will be encrypted using RSA
 
-	ssl = SSL.new(public_key, private_key, passphrase)
+	ssl = SSL.new(public_key, private_key, passphrase, "aes-256-cbc")
 
 	data = File.read("largefile.dat")
 
