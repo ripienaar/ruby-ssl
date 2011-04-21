@@ -30,14 +30,17 @@ require 'base64'
 class SSL
     PASSWD_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@$%^&*()_+{}|":\;?><,./~`'
 
-    attr_reader :public_key_file, :private_key_file
+    attr_reader :public_key_file, :private_key_file, :ssl_cipher
 
-    def initialize(pubkey=nil, privkey=nil, passphrase=nil)
+    def initialize(pubkey=nil, privkey=nil, passphrase=nil, ssl_cipher="aes-256-cbc")
         @public_key_file = pubkey
         @private_key_file = privkey
 
         @public_key  = read_key(:public, pubkey)
         @private_key = read_key(:private, privkey, passphrase)
+        @ssl_cipher = ssl_cipher
+
+        raise "Unknown SSL cipher #{ssl_cipher}" unless OpenSSL::Cipher.ciphers.include?(ssl_cipher)
     end
 
     # Encrypts supplied data using AES and then encrypts using RSA
@@ -116,7 +119,7 @@ class SSL
 
     # encrypts a string, returns a hash of key, iv and data
     def aes_encrypt(plain_string)
-        cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
+        cipher = OpenSSL::Cipher::Cipher.new(ssl_cipher)
         cipher.encrypt
 
         key = cipher.random_key
@@ -130,7 +133,7 @@ class SSL
 
     # decrypts a string given key, iv and data
     def aes_decrypt(key, crypt_string)
-        cipher = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
+        cipher = OpenSSL::Cipher::Cipher.new(ssl_cipher)
 
         cipher.decrypt
         cipher.key = key
